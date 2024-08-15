@@ -1,0 +1,60 @@
+class Solution {
+    
+    int merge(int[] nums, int low, int mid, int high) {
+        int count = 0;
+        int j = mid + 1;
+        
+        // Count reverse pairs
+        for (int i = low; i <= mid; i++) {
+            while (j <= high && nums[i] > 2L * nums[j]) {
+                j++;
+            }
+            count += j - (mid + 1);
+        }
+        
+        // In-place merge
+        int left = low;
+        int right = mid + 1;
+        
+        // Use a temporary array for merging
+        int[] temp = new int[high - low + 1];
+        int k = 0;
+
+        // Merge the two halves into temp[]
+        while (left <= mid && right <= high) {
+            if (nums[left] <= nums[right]) {
+                temp[k++] = nums[left++];
+            } else {
+                temp[k++] = nums[right++];
+            }
+        }
+
+        // Copy remaining elements of left half, if any
+        while (left <= mid) {
+            temp[k++] = nums[left++];
+        }
+
+        // Copy remaining elements of right half, if any
+        while (right <= high) {
+            temp[k++] = nums[right++];
+        }
+
+        // Copy the merged elements back into the original array
+        System.arraycopy(temp, 0, nums, low, temp.length);
+        
+        return count;
+    }
+
+    int mergeSort(int[] nums, int low, int high) {
+        if (low >= high) return 0;
+        int mid = low + (high - low) / 2;
+        int inv = mergeSort(nums, low, mid);
+        inv += mergeSort(nums, mid + 1, high);
+        inv += merge(nums, low, mid, high);
+        return inv;
+    }
+
+    public int reversePairs(int[] nums) {
+        return mergeSort(nums, 0, nums.length - 1);
+    }
+}
